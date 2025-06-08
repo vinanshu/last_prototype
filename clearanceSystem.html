@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clearance System - Clerk User</title>
+  <style>
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .sidebar {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      background: #000;
+      color: #FFD700;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #FFA500;
+      border-bottom: 2px solid #FFA500;
+      padding-bottom: 10px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #FFD700;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #FFA500;
+      color: #000;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 30px;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #000;
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .header p {
+      color: #444;
+      margin-top: 5px;
+    }
+
+
+  .main-content {
+  margin-left: 240px;
+  padding: 30px;
+  min-height: 100vh;
+  background-color: #fff; /* white background */
+  color: #333; /* dark text for readability */
+  border-left: 4px solid #FFA500; /* orange left border */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-weight: 500;
+  border-radius: 0 8px 8px 0;
+}
+
+.main-content h1,
+.main-content h2 {
+  color: #000000; /* orange headings */
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.main-content table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #333;
+  font-weight: 400;
+}
+
+.main-content table thead th {
+  border-bottom: 2px solid #000000; /* orange underline */
+  padding: 10px;
+  text-align: left;
+  background-color: #fac20b; /* subtle light yellow background */
+}
+
+.main-content table tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.main-content table tbody tr:hover {
+  background-color: #fff3cd; /* light yellow hover effect */
+}
+
+.main-content button {
+  background-color: #FFA500; /* orange button */
+  border: none;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 8px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.main-content button:hover {
+  background-color: #FFD700; /* yellow hover */
+  color: #000;
+}
+
+/* Status badges style */
+.status {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  color: #fff;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.status.pending {
+  background-color: #FFA500; /* orange */
+}
+
+.status.completed {
+  background-color: #FFD700; /* yellow */
+  color: #000;
+}
+
+.status.rejected {
+  background-color: #dc3545; /* bootstrap red */
+  color: #fff;
+}
+
+/* Form labels and inputs */
+.form-row {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #555;
+}
+
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: #fff;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+select:focus {
+  border-color: #FFA500;
+  outline: none;
+}
+
+/* Form action buttons */
+.form-actions {
+  margin-top: 20px;
+}
+
+button.cancel {
+  background-color: #ccc;
+  color: #333;
+}
+
+button.cancel:hover {
+  background-color: #bbb;
+}
+
+    
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Admin</h2>
+    <a href="/clearanceSystem.html">📊 Dashboard</a>
+    <a href="/leaveManagement.html">📝 Leave Management</a>
+    <a href="/inventoryControl.html">📦 Inventory Control</a>
+    <a href="#" class="active">✅ Clearance System</a>
+    <a href="/personnelRegister.html">👥 Personnel</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Clearance System</h1>
+
+    <section class="initiate-clearance">
+      <h2>Initiate Clearance</h2>
+      <form id="clearance-form">
+        <div class="form-row">
+          <label for="employee">Employee</label>
+          <select id="employee" required>
+            <option value="" disabled selected>Select Employee</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="clearance-type">Clearance Type</label>
+          <select id="clearance-type" required>
+            <option value="" disabled selected>Select Type</option>
+            <option>Resignation</option>
+            <option>Retirement</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="reset" class="cancel">Cancel</button>
+          <button type="submit" class="submit">Initiate Clearance</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="clearance-requests" style="margin-top: 40px;">
+      <h2>Clearance Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Request Date</th>
+            <th>Employee</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clearance-table-body">
+          <!-- Dynamic rows here -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    function statusToClass(status) {
+      return status.toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function loadEmployeeOptions() {
+      const sel = document.getElementById("employee");
+      sel.innerHTML = '<option value="" disabled selected>Select Employee</option>';
+      (JSON.parse(localStorage.getItem("personnelList"))||[])
+        .forEach(p => {
+          const o = document.createElement("option");
+          o.value = p.fullName;
+          o.textContent = p.fullName;
+          sel.appendChild(o);
+        });
+    }
+
+    function loadClearanceRequests() {
+      const tbody = document.getElementById('clearance-table-body');
+      tbody.innerHTML = '';
+      (JSON.parse(localStorage.getItem('clearanceRequests'))||[])
+        .forEach((r, i) => {
+          const cls = statusToClass(r.status);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.date}</td>
+            <td>${r.employee}</td>
+            <td>${r.type}</td>
+            <td><span class="status ${cls}">${r.status}</span></td>
+            <td>
+              <button onclick="viewRequest(${i})">View</button>
+              ${r.status==='Pending'?`
+                <button onclick="updateStatus(${i},'Completed')">Approve</button>
+                <button onclick="updateStatus(${i},'Rejected')">Reject</button>`:''}
+            </td>`;
+          tbody.appendChild(tr);
+        });
+    }
+
+    function updateStatus(i,s) {
+      const arr = JSON.parse(localStorage.getItem('clearanceRequests'))||[];
+      arr[i].status = s;
+      localStorage.setItem('clearanceRequests',JSON.stringify(arr));
+      loadClearanceRequests();
+    }
+
+    function viewRequest(i) {
+      const arr = JSON.parse(localStorage.getItem('clearanceRequests'))||[];
+      const r = arr[i];
+      alert(`Request for ${r.employee}:\nType: ${r.type}\nStatus: ${r.status}`);
+    }
+
+    document.getElementById('clearance-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const emp  = document.getElementById('employee').value;
+      const typ  = document.getElementById('clearance-type').value;
+      const reqs = JSON.parse(localStorage.getItem('clearanceRequests'))||[];
+      reqs.unshift({
+        date: new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),
+        employee: emp,
+        type: typ,
+        status: 'Pending'
+      });
+      localStorage.setItem('clearanceRequests',JSON.stringify(reqs));
+      e.target.reset();
+      loadClearanceRequests();
+    });
+
+    window.onload = () => {
+      loadEmployeeOptions();
+      loadClearanceRequests();
+    };
+  </script>
+
+</body>
+</html>

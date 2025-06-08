@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Request Leave</title>
+  <style>
+    /* Reset some default */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: row;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 240px;
+      background: linear-gradient(135deg, #1c2833, #2e4053);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+      z-index: 100;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar h2 {
+      color: #f39c12;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: 1.2px;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #ecf0f1;
+      font-weight: 600;
+      font-size: 18px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      box-shadow: inset 0 0 0 0 #f39c12;
+    }
+
+    .sidebar a:hover {
+      background-color: #f39c12;
+      color: #1c2833;
+      box-shadow: 0 0 10px #f39c12cc;
+      transform: scale(1.05);
+    }
+
+    .sidebar a.active {
+      background-color: #f39c12;
+      color: #1c2833;
+      box-shadow: 0 0 15px #f39c12cc;
+      pointer-events: none;
+      cursor: default;
+      transform: scale(1.05);
+    }
+
+    /* Main content - updated color scheme */
+    .main-content {
+      margin-left: 240px;
+      padding: 40px 50px;
+      flex: 1;
+      max-width: 1500px;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ffffff, #e0e7ff);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      border-radius: 20px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+      color: #1e293b; /* darker blue-gray text */
+    }
+
+    .main-content h1 {
+      font-weight: 700;
+      color: #34495e;
+      font-size: 2.8rem;
+      margin-bottom: 30px;
+      letter-spacing: 0.04em;
+      user-select: none;
+    }
+
+    form label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    form input[type="text"],
+    form input[type="date"],
+    form input[type="number"],
+    form select {
+      width: 100%;
+      padding: 0.55rem 0.8rem;
+      margin-bottom: 1.3rem;
+      border: 1.8px solid #a5b4fc; /* soft blue border */
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      background-color: #f9fafb; /* lighter background */
+    }
+    form input[readonly] {
+      background-color: #f39c12; /* light blue */
+      cursor: not-allowed;
+      color: #000000;
+    }
+    form input:focus,
+    form select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 8px #93c5fd;
+      background-color: #fff;
+    }
+
+    .location-group {
+      margin-bottom: 1.3rem;
+      padding: 1rem 0.6rem;
+      background-color: #dbeafe;
+      border: 1.5px solid #3b82f6;
+      border-radius: 8px;
+      display: none;
+    }
+    .location-group p {
+      margin: 0 0 0.6rem 0;
+      font-weight: 600;
+      color: #1e40af;
+    }
+    .location-group label {
+      margin-right: 1.6rem;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+    }
+    .location-group input[type="radio"] {
+      margin-right: 0.3rem;
+      cursor: pointer;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.4rem;
+    }
+    button {
+      background-color: #3b82f6;
+      border: none;
+      color: white;
+      padding: 0.65rem 1.4rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      box-shadow: 0 4px 8px rgb(59 130 246 / 0.3);
+    }
+    button:hover {
+      background-color: #2563eb;
+      box-shadow: 0 6px 12px rgb(37 99 235 / 0.4);
+    }
+    button[type="reset"] {
+      background-color: #94a3b8;
+      box-shadow: none;
+    }
+    button[type="reset"]:hover {
+      background-color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar" role="navigation" aria-label="Employee Navigation">
+    <h2>BFP Employee</h2>
+    <a href="/employee.html" aria-current="page" tabindex="0">👤 Profile</a>
+    <a href="/employeeDashboard.html" tabindex="0">📊 Dashboard</a>
+    <a href="/employeeRequest.html" tabindex="0" class="active">📝 Request Leave</a>
+    <a href="/index.html" tabindex="0">🚪 Logout</a>
+  </nav>
+
+  <main class="main-content" role="main" tabindex="-1">
+    <h1>Request Leave</h1>
+    <form id="leaveForm">
+      <label for="employeeName">Employee Name</label>
+      <input type="text" id="employeeName" readonly placeholder="Loading…" />
+
+      <label for="dateOfFiling">Date of Filing</label>
+      <input type="date" id="dateOfFiling" required />
+
+      <label for="leaveType">Leave Type</label>
+      <select id="leaveType" required>
+        <option value="" disabled selected>Select Leave Type</option>
+        <option value="Vacation">Vacation Leave</option>
+        <option value="Sick">Sick Leave</option>
+        <option value="Emergency">Emergency Leave</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <div class="location-group" id="locationGroup">
+        <p>Location</p>
+        <label><input type="radio" name="location" value="Abroad" /> Abroad</label>
+        <label><input type="radio" name="location" value="Philippines" /> Philippines</label>
+      </div>
+
+      <label for="startDate">Start Date</label>
+      <input type="date" id="startDate" required />
+
+      <label for="endDate">End Date</label>
+      <input type="date" id="endDate" required />
+
+      <label for="numDays">Number of Days</label>
+      <input type="number" id="numDays" readonly />
+
+      <div class="form-buttons">
+        <button type="reset">Cancel</button>
+        <button type="submit">Submit Request</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const leaveForm = document.getElementById('leaveForm');
+    const empNameInput = document.getElementById('employeeName');
+    const filingInput = document.getElementById('dateOfFiling');
+    const typeSelect = document.getElementById('leaveType');
+    const locGroup = document.getElementById('locationGroup');
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const daysInput = document.getElementById('numDays');
+
+    function formatDate(d){ 
+      d=new Date(d); 
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; 
+    }
+
+    function loadEmployee() {
+      const currentUser = localStorage.getItem('currentUser');
+      if(!currentUser) return window.location='/index.html';
+      const ppl = JSON.parse(localStorage.getItem('personnelList'))||[];
+      const emp = ppl.find(p=>p.username===currentUser);
+      empNameInput.value = emp?.fullName||'';
+    }
+
+    function calcDays(){
+      const s=new Date(startInput.value), e=new Date(endInput.value);
+      if(!isNaN(s)&&!isNaN(e)&&e>=s){
+        daysInput.value = Math.floor((e - s)/(1000*60*60*24)) + 1;
+      } else {
+        daysInput.value = '';
+      }
+    }
+
+    window.addEventListener('load', () => {
+      loadEmployee();
+      filingInput.value = formatDate(Date.now());
+      const minStart = new Date(); minStart.setDate(minStart.getDate()+5);
+      startInput.min = formatDate(minStart);
+      startInput.value = startInput.min;
+      endInput.min = startInput.value;
+      calcDays();
+    });
+
+    typeSelect.addEventListener('change', ()=> {
+      if(typeSelect.value==='Vacation') {
+        locGroup.style.display='block';
+        locGroup.querySelectorAll('input').forEach(i=>i.required=true);
+      } else {
+        locGroup.style.display='none';
+        locGroup.querySelectorAll('input').forEach(i=>{i.required=false;i.checked=false});
+      }
+    });
+
+    startInput.addEventListener('change', ()=>{
+      endInput.min = startInput.value;
+      if(endInput.value < endInput.min) endInput.value = endInput.min;
+      calcDays();
+    });
+    endInput.addEventListener('change', calcDays);
+
+    leaveForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const currentUser = localStorage.getItem('currentUser');
+      const req = {
+        id: Date.now(),
+        username: currentUser,
+        employeeName: empNameInput.value,
+        dateOfFiling: filingInput.value,
+        leaveType: typeSelect.value,
+        location: locGroup.style.display==='block' ? document.querySelector('input[name="location"]:checked')?.value : '',
+        startDate: startInput.value,
+        endDate: endInput.value,
+        numDays: daysInput.value,
+        status: 'Pending'
+      };
+      const arr = JSON.parse(localStorage.getItem('leaveRequests'))||[];
+      arr.push(req);
+      localStorage.setItem('leaveRequests', JSON.stringify(arr));
+      alert('Request submitted!');
+      leaveForm.reset();
+      loadEmployee();
+      filingInput.value = formatDate(Date.now());
+      const m = new Date(); m.setDate(m.getDate()+5);
+      startInput.min = startInput.value = formatDate(m);
+      endInput.min = startInput.value;
+      daysInput.value = '';
+      locGroup.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

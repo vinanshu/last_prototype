@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Personnel Registration - Bureau of Fire Protection</title>
+<style>
+   body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .sidebar {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      background: #000;
+      color: #FFD700;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #FFA500;
+      border-bottom: 2px solid #FFA500;
+      padding-bottom: 10px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #FFD700;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #FFA500;
+      color: #000;
+    }
+
+     .main-content {
+      margin-left: 240px;
+      padding: 30px;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #000;
+      margin: 0;
+      font-size: 32px;
+    }
+    
+
+    .header p {
+      color: #444;
+      margin-top: 5px;
+    }
+
+    .main-content {
+  margin-left: 240px;
+  padding: 30px 40px;
+  background-color: #fff;  /* white background */
+  min-height: 100vh;
+  color: #000;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+/* Form styling */
+.registration-form h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+}
+
+.form-row {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-row input[type="text"],
+.form-row input[type="date"],
+.form-row input[type="file"],
+.form-row select {
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1.8px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.form-row input[type="text"]:focus,
+.form-row input[type="date"]:focus,
+.form-row input[type="file"]:focus,
+.form-row select:focus {
+  border-color: #FFA500;
+  outline: none;
+}
+
+/* Buttons */
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+button.cancel,
+button.submit {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button.cancel {
+  background-color: #ddd;
+  color: #444;
+}
+
+button.cancel:hover {
+  background-color: #bbb;
+}
+
+button.submit {
+  background-color: #FFA500;
+  color: #000;
+}
+
+button.submit:hover {
+  background-color: #FFB733;
+}
+
+/* Personnel List Table */
+.personnel-list h2 {
+  margin-top: 40px;
+  margin-bottom: 15px;
+  color: #333;
+  font-weight: 600;
+}
+
+#personnel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#personnel-table thead th {
+  border-bottom: 3px solid #FFA500;
+  padding: 12px 10px;
+  text-align: left;
+  background-color: #FFF8E1;
+  color: #444;
+}
+
+#personnel-table tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  vertical-align: middle;
+}
+
+#personnel-table tbody tr:hover {
+  background-color: #FFF3D9;
+}
+
+/* Photo thumbnails */
+.photo-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Edit button */
+button.edit {
+  background-color: #FFA500;
+  color: #000;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.edit:hover {
+  background-color: #FFB733;
+}
+
+</style>  
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Admin</h2>
+    <a href="/admin.html">📊 Dashboard</a>
+    <a href="/leaveManagement.html">📝 Leave Management</a>
+    <a href="/inventoryControl.html">📦 Inventory Control</a>
+    <a href="/clearanceSystem.html">✅ Clearance System</a>
+    <a href="#" class="active">👥 Personnel</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h1>Personnel Registration</h1>
+
+    <section class="registration-form">
+      <h2>Register New Personnel</h2>
+      <form id="personnel-form">
+        <input type="hidden" id="edit-index" value="" />
+        <div class="form-row">
+          <label for="id-number">ID Number</label>
+          <input type="text" id="id-number" placeholder="Enter ID Number" required />
+        </div>
+
+        <div class="form-row">
+          <label for="full-name">Full Name</label>
+          <input type="text" id="full-name" placeholder="Enter Full Name" required />
+        </div>
+
+        <div class="form-row">
+          <label for="rank">Rank</label>
+          <select id="rank" required>
+            <option value="" disabled selected>Select Rank</option>
+            <option>Firefighter</option>
+            <option>Sergeant</option>
+            <option>Lieutenant</option>
+            <option>Captain</option>
+            <option>Chief</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="designation">Designation</label>
+          <input type="text" id="designation" placeholder="Enter Designation" required />
+        </div>
+
+        <div class="form-row">
+          <label for="station">Station Assignment</label>
+          <input type="text" id="station" placeholder="Enter Station Name" required />
+        </div>
+
+        <div class="form-row">
+          <label for="birth-date">Birth Date</label>
+          <input type="date" id="birth-date" required />
+        </div>
+
+        <div class="form-row">
+          <label for="date-hired">Date Hired</label>
+          <input type="date" id="date-hired" required />
+        </div>
+
+        <div class="form-row">
+          <label for="photo">Upload Photo</label>
+          <input type="file" id="photo" accept="image/*" />
+        </div>
+
+        <div class="form-actions">
+          <button type="reset" class="cancel">Cancel</button>
+          <button type="submit" class="submit">Register Personnel</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="personnel-list">
+      <h2>All Registered Personnel</h2>
+      <table id="personnel-table">
+        <thead>
+          <tr>
+            <th>ID Number</th>
+            <th>Full Name</th>
+            <th>Rank</th>
+            <th>Designation</th>
+            <th>Station</th>
+            <th>Birth Date</th>
+            <th>Date Hired</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Photo</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamic rows inserted here -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    function generateCredentials(fullName) {
+      const username = fullName.toLowerCase().replace(/\s+/g, ".");
+      const password = Math.random().toString(36).slice(-8);
+      return { username, password };
+    }
+
+    function loadPersonnel() {
+      const tableBody = document.querySelector("#personnel-table tbody");
+      tableBody.innerHTML = "";
+
+      const personnel = JSON.parse(localStorage.getItem("personnelList")) || [];
+
+      personnel.forEach((person, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${person.idNumber}</td>
+          <td>${person.fullName}</td>
+          <td>${person.rank}</td>
+          <td>${person.designation}</td>
+          <td>${person.station}</td>
+          <td>${person.birthDate}</td>
+          <td>${person.dateHired}</td>
+          <td>${person.username}</td>
+          <td>${person.password}</td>
+          <td>${person.photo ? `<img src="${person.photo}" alt="Photo" class="photo-thumb" />` : ''}</td>
+          <td><button class="edit" onclick="editPersonnel(${index})">Edit</button></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function editPersonnel(index) {
+      const personnelList = JSON.parse(localStorage.getItem("personnelList")) || [];
+      const person = personnelList[index];
+
+      document.getElementById("edit-index").value = index;
+      document.getElementById("id-number").value = person.idNumber;
+      document.getElementById("full-name").value = person.fullName;
+      document.getElementById("rank").value = person.rank;
+      document.getElementById("designation").value = person.designation;
+      document.getElementById("station").value = person.station;
+      document.getElementById("birth-date").value = person.birthDate;
+      document.getElementById("date-hired").value = person.dateHired;
+      // Clear file input - can't set value programmatically for security reasons
+      document.getElementById("photo").value = "";
+      currentPhotoData = person.photo || "";
+    }
+
+    let currentPhotoData = "";
+
+    document.getElementById("personnel-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const idNumber = document.getElementById("id-number").value.trim();
+      const fullName = document.getElementById("full-name").value.trim();
+      const rank = document.getElementById("rank").value;
+      const designation = document.getElementById("designation").value.trim();
+      const station = document.getElementById("station").value.trim();
+      const birthDate = document.getElementById("birth-date").value;
+      const dateHired = document.getElementById("date-hired").value;
+      const editIndex = document.getElementById("edit-index").value;
+
+      if (!idNumber || !fullName || !rank || !designation || !station || !birthDate || !dateHired) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      let personnelList = JSON.parse(localStorage.getItem("personnelList")) || [];
+
+      let credentials;
+      if (editIndex !== "") {
+        // Editing existing
+        credentials = {
+          username: personnelList[editIndex].username,
+          password: personnelList[editIndex].password
+        };
+        personnelList.splice(editIndex, 1); // Remove old
+      } else {
+        // New registration
+        credentials = generateCredentials(fullName);
+      }
+
+      const photoInput = document.getElementById("photo");
+
+      if (photoInput.files && photoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          currentPhotoData = event.target.result;
+          savePersonnel();
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+      } else {
+        // If editing and no new photo selected, keep old photo
+        if (editIndex !== "") {
+          currentPhotoData = currentPhotoData || "";
+        } else {
+          currentPhotoData = "";
+        }
+        savePersonnel();
+      }
+
+      function savePersonnel() {
+        const newPersonnel = {
+          idNumber,
+          fullName,
+          rank,
+          designation,
+          station,
+          birthDate,
+          dateHired,
+          username: credentials.username,
+          password: credentials.password,
+          photo: currentPhotoData
+        };
+
+        personnelList.push(newPersonnel);
+        localStorage.setItem("personnelList", JSON.stringify(personnelList));
+
+        if (editIndex === "") {
+          alert(`Personnel Registered\nUsername: ${credentials.username}\nPassword: ${credentials.password}`);
+        } else {
+          alert("Personnel updated successfully.");
+        }
+
+        document.getElementById("personnel-form").reset();
+        document.getElementById("edit-index").value = "";
+        currentPhotoData = "";
+        loadPersonnel();
+      }
+    });
+
+    window.onload = loadPersonnel;
+  </script>
+
+</body>
+</html>

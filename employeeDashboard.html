@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Employee Dashboard - Bureau of Fire Protection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f7fa;
+      color: #2c3e50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: row;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Sidebar styles */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 240px;
+      background: linear-gradient(135deg, #1c2833, #2e4053);
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+      z-index: 100;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar h2 {
+      color: #f39c12;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: 1.2px;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #ecf0f1;
+      font-weight: 600;
+      font-size: 18px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      box-shadow: inset 0 0 0 0 #f39c12;
+    }
+
+    .sidebar a:hover {
+      background-color: #f39c12;
+      color: #1c2833;
+      box-shadow: 0 0 10px #f39c12cc;
+      transform: scale(1.05);
+    }
+
+    .sidebar a.active {
+      background-color: #f39c12;
+      color: #1c2833;
+      box-shadow: 0 0 15px #f39c12cc;
+      pointer-events: none;
+      cursor: default;
+      transform: scale(1.05);
+    }
+
+    /* Main content */
+    .main-content {
+      margin-left: 240px;
+      padding: 40px 50px;
+      flex: 1;
+      max-width: 1500px;
+      min-height: 100vh;
+      background: #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      border-radius: 12px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+
+    .main-content h1 {
+      font-weight: 700;
+      color: #34495e;
+      font-size: 2.8rem;
+      margin-bottom: 30px;
+      letter-spacing: 0.04em;
+      user-select: none;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-stats {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 200px;
+      background: #fefefe;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 6px 25px rgba(243, 156, 18, 0.25);
+      transform: translateY(-5px);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: #f39c12;
+    }
+
+    .stat-card h3 {
+      color: #f39c12;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 15px;
+      user-select: none;
+    }
+
+    .stat-card .stat-value {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+
+    .stat-card:hover .stat-value {
+      color: #f39c12;
+    }
+
+    .stat-card .stat-label {
+      font-size: 1rem;
+      color: #7f8c8d;
+      font-weight: 600;
+    }
+
+    .stat-card .progress-container {
+      height: 8px;
+      background: #ecf0f1;
+      border-radius: 4px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .stat-card .progress-bar {
+      height: 100%;
+      background: #f39c12;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    /* Leave Table */
+    .leave-table-container {
+      background: #fefefe;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+      margin-bottom: 40px;
+      transition: box-shadow 0.3s ease;
+      overflow: hidden;
+    }
+
+    .leave-table-container:hover {
+      box-shadow: 0 6px 25px rgba(243, 156, 18, 0.25);
+    }
+
+    .leave-table-container h2 {
+      color: #34495e;
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f39c12;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    thead tr {
+      background: linear-gradient(135deg, #1c2833, #2e4053);
+      color: #ecf0f1;
+      user-select: none;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 1rem;
+      user-select: text;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background: rgba(243, 156, 18, 0.1);
+    }
+
+    /* Status colors */
+    .status-approved {
+      color: #27ae60;
+      font-weight: 700;
+    }
+    
+    .status-pending {
+      color: #f39c12;
+      font-weight: 700;
+    }
+    
+    .status-rejected {
+      color: #e74c3c;
+      font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 20px 15px;
+        flex-direction: row;
+        gap: 15px;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .sidebar h2 {
+        font-size: 20px;
+        margin-bottom: 0;
+        flex: 0 0 auto;
+      }
+      .sidebar a {
+        font-size: 16px;
+        padding: 10px 14px;
+        flex: 0 0 auto;
+        border-radius: 6px;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 25px 20px;
+        border-radius: 0;
+        margin-top: 15px;
+        margin-bottom: 30px;
+        max-width: 100%;
+      }
+      .dashboard-stats {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .stat-card {
+        min-width: 100%;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" role="navigation" aria-label="Employee Navigation">
+    <h2>BFP Employee</h2>
+    <a href="/employee.html" tabindex="0">👤 Profile</a>
+    <a href="/employeeDashboard.html" class="active" aria-current="page" tabindex="0">📊 Dashboard</a>
+    <a href="/employeeRequest.html" tabindex="0">📝 Request Leave</a>
+    <a href="/index.html" tabindex="0">🚪 Logout</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" role="main" tabindex="-1">
+    <div class="dashboard-header">
+      <h1>Employee Dashboard</h1>
+    </div>
+    
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <h3>Vacation Leave</h3>
+        <div class="stat-value">8</div>
+        <div class="stat-label">Days Used / 15 Total</div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 53%"></div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Sick Leave</h3>
+        <div class="stat-value">3</div>
+        <div class="stat-label">Days Used / 10 Total</div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 30%"></div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <h3>Emergency Leave</h3>
+        <div class="stat-value">1</div>
+        <div class="stat-label">Days Used / 5 Total</div>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: 20%"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="leave-table-container" aria-label="Recent Leave Requests">
+      <h2>Recent Leave Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Leave Type</th>
+            <th scope="col">Start Date</th>
+            <th scope="col">End Date</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Vacation Leave</td>
+            <td>May 10, 2025</td>
+            <td>May 14, 2025</td>
+            <td class="status-approved">Approved</td>
+          </tr>
+          <tr>
+            <td>Sick Leave</td>
+            <td>June 1, 2025</td>
+            <td>June 3, 2025</td>
+            <td class="status-pending">Pending</td>
+          </tr>
+          <tr>
+            <td>Emergency Leave</td>
+            <td>April 20, 2025</td>
+            <td>April 21, 2025</td>
+            <td class="status-rejected">Rejected</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+</body>
+</html>

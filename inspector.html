@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logistic Dashboard</title>
+  <link rel="stylesheet" href="/inspector/css/inspector.css" />
+  <style>
+    /* Sidebar basic styling (add if needed) */
+    .sidebar {
+      width: 200px;
+      background: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 8px 0;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    .sidebar a.active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    /* Main content styling */
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+    }
+
+    /* Just some basic styling in case you want */
+    .summary-cards {
+      display: flex;
+      gap: 1rem;
+      margin-top: 20px;
+    }
+    .card {
+      flex: 1;
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .card h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.2rem;
+    }
+    .card span {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Logistic</h2>
+    <a href="/inspector.html" class="active">📊 Dashboard</a>
+    <a href="/inspectControl.html">📦 Inventory Control</a>
+    <a href="/equipmentInspection.html">🔍 Equipment Inspections</a>
+    <a href="/inspectionReport.html">📋 Inspection Reports</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Logistic Dashboard</h1>
+      <p>Welcome, Logistic User</p>
+    </div>
+
+    <div class="summary-cards">
+      <div class="card">
+        <h3>Equipment Due for Inspection</h3>
+        <span>0</span>
+      </div>
+      <div class="card">
+        <h3>Items Needing Maintenance</h3>
+        <span>0</span>
+      </div>
+      <div class="card">
+        <h3>Pending Clearance Verifications</h3>
+        <span>0</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadDashboardSummary() {
+      // Load scheduled inspections from localStorage
+      const scheduled = JSON.parse(localStorage.getItem("scheduledInspections")) || [];
+      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+      const clearanceRequests = JSON.parse(localStorage.getItem("clearanceRequests")) || [];
+
+      const today = new Date();
+      const in7Days = new Date();
+      in7Days.setDate(today.getDate() + 7);
+
+      // Equipment due for inspection: scheduledDate within next 7 days and not past
+      const equipmentDueInspection = scheduled.filter(ins => {
+        if (!ins.scheduledDate) return false;
+        const scheduledDate = new Date(ins.scheduledDate);
+        return scheduledDate >= today && scheduledDate <= in7Days && ins.status.toLowerCase() !== "completed";
+      }).length;
+
+      // Items needing maintenance: status includes 'maintenance' (case insensitive) from inventory
+      const itemsNeedingMaintenance = inventory.filter(item => {
+        return item.status && item.status.toLowerCase().includes("maintenance");
+      }).length;
+
+      // Pending clearance verifications: clearanceRequests not completed
+      const pendingClearances = clearanceRequests.filter(c =>
+        !c.status || c.status.toLowerCase() !== "completed"
+      ).length;
+
+      // Update the summary card spans
+      const cards = document.querySelectorAll(".summary-cards .card span");
+      if (cards.length >= 3) {
+        cards[0].textContent = equipmentDueInspection;
+        cards[1].textContent = itemsNeedingMaintenance;
+        cards[2].textContent = pendingClearances;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadDashboardSummary);
+  </script>
+</body>
+</html>

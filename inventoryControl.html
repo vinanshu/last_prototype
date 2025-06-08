@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory Control - Admin</title>
+  <style>
+     body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .sidebar {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      background: #000;
+      color: #FFD700;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #FFA500;
+      border-bottom: 2px solid #FFA500;
+      padding-bottom: 10px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #FFD700;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #FFA500;
+      color: #000;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 30px;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #000;
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .header p {
+      color: #444;
+      margin-top: 5px;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      margin-left: 240px;
+      padding: 30px;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+
+    .main-content h1 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+  color: #000000; /* Orange headings */
+}
+
+.main-content p {
+  color: #000000; /* Yellow paragraph text */
+  margin-bottom: 20px;
+}
+
+/* Summary cards */
+.summary-cards {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #1a1a1a; /* Dark black/gray background */
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(255, 165, 0, 0.6); /* Orange glow */
+  padding: 15px;
+  flex: 1;
+  min-width: 160px;
+  text-align: center;
+  color: #FFD700; /* Yellow text */
+  border: 1px solid #FFA500; /* Orange border */
+}
+
+.card h3 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #FFA500; /* Orange titles */
+}
+
+.card span {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #FFD700; /* Yellow numbers */
+}
+
+/* Barcode scan */
+.barcode-scan label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #000000; /* Orange label */
+}
+
+#barcode {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #FFA500; /* Orange border */
+  background-color: #1a1a1a; /* dark input background */
+  color: #FFD700; /* yellow input text */
+}
+
+/* Add Equipment form */
+.add-equipment {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(255, 165, 0, 0.6);
+  margin-bottom: 30px;
+  color: #FFD700;
+  min-height: 50vh; /* full viewport height */
+  box-sizing: border-box; /* include padding in height */
+  display: flex;
+  flex-direction: column;
+}
+
+.add-equipment h2 {
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+  color: #FFA500;
+}
+
+.form-row {
+  margin-bottom: 15px; /* add spacing between rows */
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #FFA500;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #FFA500;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+  background-color: #000000;
+  color: #FFD700;
+}
+
+/* Placeholder color */
+.form-row input::placeholder,
+.form-row select::placeholder,
+.form-row textarea::placeholder {
+  color: #FFCF33; /* lighter golden yellow */
+  opacity: 1; /* make sure placeholder is visible */
+}
+
+/* Buttons */
+.form-actions {
+  margin-top: auto; /* push buttons to bottom if form expands */
+  display: flex;
+  gap: 10px;
+}
+
+.form-actions .cancel {
+  background-color: #555555;
+  color: #FFD700;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.form-actions .cancel:hover {
+  background-color: #777777;
+}
+
+.form-actions .submit {
+  background-color: #FFA500;
+  color: #000000;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.form-actions .submit:hover {
+  background-color: #ffb733;
+}
+
+
+/* Inventory table container */
+.inventory-table-container {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(255, 165, 0, 0.6);
+  color: #FFD700;
+}
+
+.inventory-table-container h2 {
+  margin-bottom: 15px;
+  font-size: 1.4rem;
+  color: #FFA500;
+}
+
+.search-bar label {
+  color: #FFA500;
+}
+
+#search {
+  flex-grow: 1;
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #FFA500;
+  background-color: #000000;
+  color: #FFD700;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #FFD700;
+}
+
+th, td {
+  border: 1px solid #FFA500;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #000000;
+  font-weight: 600;
+  color: #FFA500;
+}
+
+button.delete {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button.delete:hover {
+  background-color: #c0392b;
+}
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Admin</h2>
+    <a href="/admin.html">📊 Dashboard</a>
+    <a href="/leaveManagement.html">📝 Leave Management</a>
+    <a href="#" class="active">📦 Inventory Control</a>
+    <a href="/clearanceSystem.html">✅ Clearance System</a>
+    <a href="/personnelRegister.html">👥 Personnel</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <main class="main-content">
+    <h1>Inventory Control</h1>
+    <p>Employee User</p>
+
+    <div class="summary-cards">
+      <div class="card"><h3>Total Items</h3><span id="total-count">0</span></div>
+      <div class="card"><h3>Assigned</h3><span id="assigned-count">0</span></div>
+      <div class="card"><h3>In Storage</h3><span id="storage-count">0</span></div>
+      <div class="card"><h3>Needs Maintenance</h3><span id="maintenance-count">0</span></div>
+    </div>
+
+    <div class="barcode-scan">
+      <label for="barcode">Scan Barcode</label>
+      <input type="text" id="barcode" placeholder="Scan Barcode" />
+    </div>
+
+    <div class="add-equipment">
+      <h2>Add New Equipment</h2>
+      <form id="equipment-form">
+        <div class="form-row">
+          <label for="equip-name">Equipment Name</label>
+          <input type="text" id="equip-name" placeholder="Enter equipment name" required />
+        </div>
+        <div class="form-row">
+          <label for="equip-code">Barcode/Item Code</label>
+          <input type="text" id="equip-code" placeholder="Enter barcode or item code" required />
+        </div>
+        <div class="form-row">
+          <label for="category">Category</label>
+          <select id="category" required>
+            <option value="" disabled selected>Select category</option>
+            <option>Firefighting Equipment</option>
+            <option>Protective Gear</option>
+            <option>Vehicle Equipment</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="status">Status</label>
+          <select id="status" required>
+            <option value="" disabled selected>Select status</option>
+            <option>Good</option>
+            <option>Needs Maintenance</option>
+            <option>Damaged</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="assigned-to">Assigned To</label>
+          <select id="assigned-to" required>
+            <option value="Not Assigned" selected>Not Assigned</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="purchase-date">Purchase Date</label>
+          <input type="date" id="purchase-date" placeholder="Select purchase date" required />
+        </div>
+        <div class="form-actions">
+          <button type="reset" class="cancel">Cancel</button>
+          <button type="submit" class="submit">Add Equipment</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="inventory-table-container">
+      <h2>Inventory List</h2>
+      <div class="search-bar">
+        <label for="search">Search Inventory</label>
+        <input type="text" id="search" placeholder="Search by Equipment Name, Code, or Assigned To" />
+      </div>
+      <table id="inventory-table" aria-live="polite" aria-label="Inventory Table">
+        <thead>
+          <tr>
+            <th>Equipment Name</th>
+            <th>Barcode/Item Code</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+            <th>Purchase Date</th>
+            <th>Last Checked</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Inventory items go here -->
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+<script>
+  // Function to load personnel for "Assigned To" dropdown from personnelRegister localStorage
+  function loadPersonnel() {
+    const assignedToSelect = document.getElementById("assigned-to");
+    assignedToSelect.innerHTML = '<option value="Not Assigned" selected>Not Assigned</option>';
+
+    const personnel = JSON.parse(localStorage.getItem("personnel")) || [];
+    personnel.forEach(person => {
+      const option = document.createElement("option");
+      option.value = person.fullName;
+      option.textContent = person.fullName;
+      assignedToSelect.appendChild(option);
+    });
+  }
+
+  // Function to load inventory from localStorage and render table
+  function loadInventory() {
+    const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+    const tbody = document.querySelector("#inventory-table tbody");
+    tbody.innerHTML = "";
+
+    inventory.forEach(item => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.itemCode}</td>
+        <td>${item.category}</td>
+        <td>${item.status}</td>
+        <td>${item.assignedTo}</td>
+        <td>${item.purchaseDate}</td>
+        <td>${item.lastChecked}</td>
+        <td><button class="delete" aria-label="Delete ${item.name}">Delete</button></td>
+      `;
+
+      tr.querySelector(".delete").addEventListener("click", () => {
+        if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+          deleteInventoryItem(item.itemCode);
+        }
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    updateSummaryCounts();
+  }
+
+  // Function to delete inventory item by itemCode
+  function deleteInventoryItem(itemCode) {
+    let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+    inventory = inventory.filter(item => item.itemCode !== itemCode);
+    localStorage.setItem("inventory", JSON.stringify(inventory));
+    loadInventory();
+  }
+
+  // Update summary card counts
+  function updateSummaryCounts() {
+    const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+    const totalCount = inventory.length;
+    const assignedCount = inventory.filter(item => item.assignedTo && item.assignedTo !== "Not Assigned").length;
+    const storageCount = inventory.filter(item => item.assignedTo === "Not Assigned").length;
+    const maintenanceCount = inventory.filter(item => item.status === "Needs Maintenance").length;
+
+    document.getElementById("total-count").textContent = totalCount;
+    document.getElementById("assigned-count").textContent = assignedCount;
+    document.getElementById("storage-count").textContent = storageCount;
+    document.getElementById("maintenance-count").textContent = maintenanceCount;
+  }
+
+  // Filter inventory table based on search input
+  document.getElementById("search").addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#inventory-table tbody tr");
+
+    rows.forEach(row => {
+      const name = row.cells[0].textContent.toLowerCase();
+      const code = row.cells[1].textContent.toLowerCase();
+      const assignedTo = row.cells[4].textContent.toLowerCase();
+
+      if (name.includes(query) || code.includes(query) || assignedTo.includes(query)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  });
+
+  // Handle form submission to add new equipment
+  document.getElementById("equipment-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const name = document.getElementById("equip-name").value.trim();
+    const itemCode = document.getElementById("equip-code").value.trim();
+    const category = document.getElementById("category").value;
+    const status = document.getElementById("status").value;
+    const assignedTo = document.getElementById("assigned-to").value;
+    const purchaseDate = document.getElementById("purchase-date").value;
+
+    if (!name || !itemCode || !category || !status || !purchaseDate) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+    // Check for duplicate itemCode
+    if (inventory.some(item => item.itemCode === itemCode)) {
+      alert("An item with this barcode/item code already exists.");
+      return;
+    }
+
+    const newItem = {
+      name,
+      itemCode,
+      category,
+      status,
+      assignedTo,
+      purchaseDate,
+      lastChecked: purchaseDate
+    };
+
+    inventory.push(newItem);
+    localStorage.setItem("inventory", JSON.stringify(inventory));
+    loadInventory();
+    this.reset();
+  });
+
+  // Barcode input listener: auto-fill search for barcode
+  document.getElementById("barcode").addEventListener("input", function () {
+    const val = this.value.trim();
+    if (val === "") {
+      // reset search
+      document.getElementById("search").value = "";
+      document.getElementById("search").dispatchEvent(new Event("input"));
+      return;
+    }
+    document.getElementById("search").value = val;
+    document.getElementById("search").dispatchEvent(new Event("input"));
+  });
+
+  // Initial load
+  loadPersonnel();
+  loadInventory();
+</script>
+
+</body>
+</html>

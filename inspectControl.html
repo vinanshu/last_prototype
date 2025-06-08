@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory Control</title>
+  <link rel="stylesheet" href="/inspector/css/inspector.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .btn {
+      padding: 6px 12px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.edit { background-color: #2980b9; color: white; }
+    .btn.edit:hover { background-color: #2471a3; }
+    .btn.scan, .btn.add-new {
+      background-color: #27ae60;
+      color: white;
+    }
+    .btn.scan:hover, .btn.add-new:hover { background-color: #219150; }
+
+    .sidebar {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      position: fixed;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px;
+      margin: 5px 0;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #34495e;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 20px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+
+    .barcode-scanner {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      margin-top: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    #scanner-video {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 4px;
+    }
+    #close-scanner {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #c0392b;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #barcode-result {
+      margin-top: 15px;
+      font-size: 1rem;
+    }
+    #scanner-error {
+      color: red;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    #edit-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    #edit-modal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 6px;
+      width: 320px;
+    }
+    #edit-modal label {
+      font-weight: bold;
+    }
+    #edit-modal select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+    }
+    .modal-actions {
+      text-align: right;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Inspector</h2>
+    <a href="inspector.html">📊 Dashboard</a>
+    <a href="inventoryControl.html" class="active">📦 Inventory Control</a>
+    <a href="equipmentInspection.html">🔍 Equipment Inspections</a>
+    <a href="inspectionReport.html">📋 Inspection Reports</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="section-header">
+      <h2>Equipment Inventory</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Item Code</th>
+          <th>Equipment Name</th>
+          <th>Category</th>
+          <th>Assigned To</th>
+          <th>Status</th>
+          <th>Last Inspection</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <section class="barcode-scanner" id="barcode-scanner-section">
+      <button id="close-scanner">Close</button>
+      <h3>Barcode Scanner</h3>
+      <video id="scanner-video" autoplay></video>
+      <div id="barcode-result"></div>
+      <div id="scanner-error"></div>
+    </section>
+
+    <button class="btn scan" id="scan-equipment-btn" style="margin-top:20px;">Scan Equipment</button>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="edit-modal">
+    <div class="modal-content">
+      <h3>Edit Equipment Status</h3>
+      <form id="edit-form">
+        <input type="hidden" id="edit-item-code" />
+        <label>Status:</label>
+        <select id="edit-status" required>
+          <option value="Needs Maintenance">Needs Maintenance</option>
+          <option value="Damaged">Damaged</option>
+          <option value="Missing">Missing</option>
+        </select>
+        <div class="modal-actions">
+          <button type="button" class="btn" style="background:#7f8c8d; color:white;" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn" style="background:#27ae60; color:white;">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function loadInventoryForInspector() {
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+      inventory.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.itemCode}</td>
+          <td>${item.name}</td>
+          <td>${item.category}</td>
+          <td>${item.assignedTo}</td>
+          <td>${item.status}</td>
+          <td>${item.lastChecked || "N/A"}</td>
+          <td>
+            <button class="btn edit" data-code="${item.itemCode}">Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Attach edit button listeners after DOM is updated
+      document.querySelectorAll(".btn.edit").forEach(button => {
+        button.addEventListener("click", () => {
+          const code = button.getAttribute("data-code");
+          openEditModal(code);
+        });
+      });
+    }
+
+    function openEditModal(itemCode) {
+      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+      const item = inventory.find(i => i.itemCode === itemCode);
+      if (!item) return;
+
+      document.getElementById("edit-item-code").value = item.itemCode;
+      document.getElementById("edit-status").value = item.status;
+      document.getElementById("edit-modal").style.display = "flex";
+    }
+
+    function closeEditModal() {
+      document.getElementById("edit-modal").style.display = "none";
+    }
+
+    function startScanner() {
+      resultDiv.textContent = "";
+      errorDiv.textContent = "";
+      scannerSection.style.display = "block";
+
+      if (!("BarcodeDetector" in window)) {
+        errorDiv.textContent = "Barcode Detection API not supported.";
+        return;
+      }
+
+      barcodeDetector = new BarcodeDetector({ formats: ['code_128', 'ean_13', 'qr_code'] });
+
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(s => {
+          stream = s;
+          video.srcObject = stream;
+          requestAnimationFrame(detectBarcode);
+        })
+        .catch(err => {
+          errorDiv.textContent = "Camera error: " + err.message;
+        });
+    }
+
+    function stopScanner() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      scannerSection.style.display = "none";
+    }
+
+    async function detectBarcode() {
+      if (!barcodeDetector) return;
+
+      try {
+        const barcodes = await barcodeDetector.detect(video);
+        if (barcodes.length > 0) {
+          const barcode = barcodes[0].rawValue;
+          stopScanner();
+
+          const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+          const matched = inventory.find(item => item.itemCode === barcode);
+
+          if (matched) {
+            resultDiv.innerHTML = `
+              <strong>Scanned Code:</strong> ${barcode}<br>
+              <strong>Name:</strong> ${matched.name}<br>
+              <strong>Category:</strong> ${matched.category}<br>
+              <strong>Assigned To:</strong> ${matched.assignedTo}<br>
+              <strong>Status:</strong> <span style="color: ${
+                matched.status === "Operational" ? "green" :
+                matched.status === "Needs Maintenance" ? "orange" :
+                matched.status === "Damaged" ? "red" : "gray"
+              }">${matched.status}</span><br>
+              <strong>Last Checked:</strong> ${matched.lastChecked || "N/A"}
+            `;
+          } else {
+            resultDiv.innerHTML = `<strong>Scanned Code: ${barcode}</strong><br><span style="color:red;">No matching item found.</span>`;
+          }
+
+          return;
+        }
+      } catch (err) {
+        errorDiv.textContent = "Detection error: " + err.message;
+      }
+
+      requestAnimationFrame(detectBarcode);
+    }
+
+    // Run after DOM is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      loadInventoryForInspector();
+
+      document.getElementById("edit-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const itemCode = document.getElementById("edit-item-code").value;
+        const newStatus = document.getElementById("edit-status").value;
+
+        let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+        const index = inventory.findIndex(i => i.itemCode === itemCode);
+        if (index !== -1) {
+          inventory[index].status = newStatus;
+          inventory[index].lastChecked = new Date().toLocaleDateString();
+          localStorage.setItem("inventory", JSON.stringify(inventory));
+          loadInventoryForInspector();
+          closeEditModal();
+        }
+      });
+
+      document.getElementById("scan-equipment-btn").addEventListener("click", startScanner);
+      document.getElementById("close-scanner").addEventListener("click", stopScanner);
+    });
+
+    // Barcode scanner references
+    const scanBtn = document.getElementById("scan-equipment-btn");
+    const scannerSection = document.getElementById("barcode-scanner-section");
+    const video = document.getElementById("scanner-video");
+    const resultDiv = document.getElementById("barcode-result");
+    const errorDiv = document.getElementById("scanner-error");
+    const closeBtn = document.getElementById("close-scanner");
+
+    let stream = null;
+    let barcodeDetector = null;
+  </script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inspection Reports</title>
+  <link rel="stylesheet" href="/inspector/css/inspector.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .sidebar {
+      width: 200px;
+      background: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 8px 0;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+    }
+    .sidebar a.active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    table,
+    th,
+    td {
+      border: 1px solid #ccc;
+    }
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+    }
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+    .btn.verify {
+      background-color: #28a745;
+    }
+    .btn.reject {
+      background-color: #dc3545;
+    }
+    .btn:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Inspector</h2>
+    <a href="inspector.html">📊 Dashboard</a>
+    <a href="equipmentInspection.html">📦 Inventory Control</a>
+    <a href="equipmentInspection.html">🔍 Equipment Inspections</a>
+    <a href="inspectionReport.html" class="active">📋 Inspection Reports</a>
+    <a href="/index.html">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <section class="pending-clearances">
+      <div class="section-header">
+        <h2>Pending Clearance Verifications</h2>
+        <a href="#">View All</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Request Date</th>
+            <th>Items to Verify</th>
+            <th>Equipment Names</th>
+            <th>Equipment Statuses</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clearance-body">
+          <!-- JS will populate rows -->
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    function loadClearances() {
+      let clearances = JSON.parse(localStorage.getItem("clearanceRequests")) || [];
+      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+      // Group inventory by employee for quick access
+      const inventoryByEmployee = {};
+      inventory.forEach((item) => {
+        if (!inventoryByEmployee[item.assignedTo]) {
+          inventoryByEmployee[item.assignedTo] = [];
+        }
+        inventoryByEmployee[item.assignedTo].push(item);
+      });
+
+      // Sort clearances by employee name
+      clearances.sort((a, b) => a.employee.localeCompare(b.employee));
+
+      // Update clearance statuses and assign missingAmount
+      clearances.forEach((clearance) => {
+        const assignedItems = inventoryByEmployee[clearance.employee] || [];
+        const nonOperationalItems = assignedItems.filter(
+          (item) => item.status !== "Operational"
+        );
+
+        clearance.items = nonOperationalItems.length;
+        clearance.equipmentNames = nonOperationalItems.map(
+          (i) => i.equipmentName || i.name || "Unnamed"
+        );
+        clearance.equipmentStatuses = nonOperationalItems.map(
+          (i) => i.status || "Unknown"
+        );
+
+        if (!clearance.requestDate) {
+          clearance.requestDate = new Date().toISOString();
+        }
+
+        if (
+          clearance.status !== "Rejected" &&
+          clearance.status !== "Equipment Clearance Missing" &&
+          clearance.items === 0
+        ) {
+          clearance.status = "Verified";
+        }
+      });
+
+      localStorage.setItem("clearanceRequests", JSON.stringify(clearances));
+
+      const tbody = document.getElementById("clearance-body");
+      tbody.innerHTML = "";
+
+      clearances.forEach((clearance, index) => {
+        const assignedItems = inventoryByEmployee[clearance.employee] || [];
+        const nonOperationalItems = assignedItems.filter(
+          (item) => item.status !== "Operational"
+        );
+
+        if (nonOperationalItems.length === 0) {
+          // No items to verify — show a single row with "0 items"
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${clearance.employee}</td>
+            <td>${formatDate(clearance.requestDate)}</td>
+            <td>0 items</td>
+            <td>-</td>
+            <td>-</td>
+            <td id="status-${index}">${clearance.status}</td>
+            <td>
+              <button class="btn verify" onclick="verifyClearance(${index})" ${
+                clearance.status === "Completed" ? "disabled" : ""
+              }>Verify</button>
+              <button class="btn reject" onclick="rejectClearance(${index})">Reject</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        } else {
+          // Show one row per each item with employee name only on first row of that employee
+          nonOperationalItems.forEach((item, i) => {
+            let statusCellContent = clearance.status;
+            if (
+              i === 0 &&
+              clearance.status === "Equipment Clearance Missing"
+            ) {
+              statusCellContent += `<br>
+                <small>Amount to Purchase: ₱
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    id="missing-amount-${index}"
+                    value="${
+                      clearance.missingAmount
+                        ? clearance.missingAmount.toFixed(2)
+                        : "0.00"
+                    }"
+                    style="width: 100px;"
+                  />
+                  <button onclick="saveMissingAmount(${index})" style="margin-left:5px; padding:2px 6px;">Save</button>
+                </small>
+              `;
+            }
+
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${i === 0 ? clearance.employee : ""}</td>
+              <td>${i === 0 ? formatDate(clearance.requestDate) : ""}</td>
+              <td>1 item</td>
+              <td>${item.equipmentName || item.name || "Unnamed"}</td>
+              <td>${item.status || "Unknown"}</td>
+              <td id="status-${index}">${i === 0 ? statusCellContent : ""}</td>
+              <td>
+                ${
+                  i === 0
+                    ? `<button class="btn verify" onclick="verifyClearance(${index})" ${
+                        clearance.status === "Completed" ? "disabled" : ""
+                      }>Verify</button>
+                      <button class="btn reject" onclick="rejectClearance(${index})">Reject</button>`
+                    : ""
+                }
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      });
+    }
+
+    function verifyClearance(index) {
+      const clearances = JSON.parse(localStorage.getItem("clearanceRequests")) || [];
+      clearances[index].status = "Completed";
+      if (!clearances[index].requestDate) {
+        clearances[index].requestDate = new Date().toISOString();
+      }
+      delete clearances[index].missingAmount;
+      localStorage.setItem("clearanceRequests", JSON.stringify(clearances));
+      loadClearances();
+    }
+
+    function rejectClearance(index) {
+      const clearances = JSON.parse(localStorage.getItem("clearanceRequests")) || [];
+      const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+      const clearance = clearances[index];
+      const missingItems = inventory.filter(
+        (item) =>
+          item.assignedTo === clearance.employee && item.status !== "Operational"
+      );
+
+      let totalAmount = 0;
+      for (const item of missingItems) {
+        totalAmount += parseFloat(item.amount || 0);
+      }
+
+      clearance.status = "Equipment Clearance Missing";
+      clearance.missingAmount = totalAmount;
+
+      if (!clearance.requestDate) {
+        clearance.requestDate = new Date().toISOString();
+      }
+
+      localStorage.setItem("clearanceRequests", JSON.stringify(clearances));
+      loadClearances();
+    }
+
+    function saveMissingAmount(index) {
+      const clearances = JSON.parse(localStorage.getItem("clearanceRequests")) || [];
+      const input = document.getElementById(`missing-amount-${index}`);
+
+      if (input) {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val >= 0) {
+          clearances[index].missingAmount = val;
+          localStorage.setItem("clearanceRequests", JSON.stringify(clearances));
+          loadClearances();
+          alert("Missing amount updated.");
+        } else {
+          alert("Please enter a valid non-negative number.");
+        }
+      }
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadClearances);
+  </script>
+</body>
+</html>
