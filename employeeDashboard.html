@@ -803,36 +803,7 @@
         loadLeaveCredits();
       }
     });
-    function startLeaveCreditIncrement() {
-  // Update every minute (60000ms)
-  setInterval(() => {
-    ['vacation', 'sick', 'emergency'].forEach(type => {
-      const current = parseFloat(localStorage.getItem(`${type}Leave`)) || (type === 'emergency' ? 5 : 15);
-      const increment = 1.25;
-      const newValue = (current + increment).toFixed(2);
-      
-      // Don't exceed max credits
-      const max = type === 'emergency' ? 5 : 15;
-      const finalValue = Math.min(newValue, max);
-      
-      localStorage.setItem(`${type}Leave`, finalValue);
-      
-      // Update UI if on dashboard
-      if (document.getElementById(`${type}LeaveRemaining`)) {
-        document.getElementById(`${type}LeaveRemaining`).textContent = finalValue;
-        const percentage = (finalValue / max) * 100;
-        const progressBar = document.getElementById(`${type}Progress`);
-        progressBar.style.width = `${percentage}%`;
-        updateProgressBarColor(progressBar, percentage); // Add this line
-      }
-    });
-  }, 6000); // 1 minute
-}
-// Call this when the dashboard loads
-window.addEventListener('load', () => {
-  loadLeaveCredits();
-  startLeaveCreditIncrement(); // Start the auto-increment
-});
+   
   </script>
 </body>
 </html>
