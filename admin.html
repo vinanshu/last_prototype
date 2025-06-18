@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />  
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
   <style>
@@ -105,6 +106,7 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      overflow: hidden; /* Hide any overflow from the table */
     }
 
     .table-header {
@@ -112,6 +114,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
+      gap: 20px;
     }
 
     .table-header h2 {
@@ -125,7 +128,65 @@
       color: #FFA500;
       font-weight: bold;
     }
+    .search-container {
+  position: relative;
+  flex-grow: 1;
+  max-width: 400px;
+  margin: 0 auto;
+}
 
+#searchInput {
+  width: 100%;
+  padding: 8px 15px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+  outline: none;
+  border-color: #FFA500;
+  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+}
+.searchInput {
+  width: 100%;
+  padding: 8px 15px 8px 35px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #FFA500;
+  box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+}
+  thead {
+    display: table;
+    width: calc(100% - 10px); /* Compensate for scrollbar width */
+    table-layout: fixed;
+  }
+
+  tbody {
+    display: block;
+    max-height: 300px; /* Adjust this value as needed */
+    overflow-y:auto;
+    width: 2530px;
+  }
+  tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -146,22 +207,185 @@
     td {
       background-color: #fff;
       color: #333;
-    }
+      max-width: 200px;
 
-    .actions button {
-      background-color: #FFA500;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      color: #000;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.2s;
-    }
 
-    .actions button:hover {
-      background-color: #e69500;
     }
+    .view-icon-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  width: 80px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.view-icon-btn:hover {
+  background-color: #2980b9;
+  transform: scale(1.1);
+}
+
+/* Modal styles (similar to employee dashboard) */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #7f8c8d;
+}
+
+.modal-close:hover {
+  color: #e74c3c;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+}
+/* Add these to your existing CSS */
+/* Modal animation */
+@keyframes modalFadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalFadeOut {
+  from { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to { 
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+.modal-content {
+  animation: modalFadeIn 0.3s ease forwards;
+}
+
+.modal.fade-out .modal-content {
+  animation: modalFadeOut 0.3s ease forwards;
+}
+
+/* Button hover animations */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.view-icon-btn:hover {
+  animation: pulse 0.5s ease infinite;
+}
+
+/* Table row animations */
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+tbody tr {
+  animation: fadeInRow 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Stagger the row animations */
+tbody tr:nth-child(1) { animation-delay: 0.1s; }
+tbody tr:nth-child(2) { animation-delay: 0.2s; }
+tbody tr:nth-child(3) { animation-delay: 0.3s; }
+tbody tr:nth-child(4) { animation-delay: 0.4s; }
+tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+/* Smooth scrolling for table */
+tbody {
+  scroll-behavior: smooth;
+}
+
+/* Card hover animation */
+.summary-cards .card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.summary-cards .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+.reason-text {
+  background: #f5f7fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+.actions button {
+  background-color: #FFA500;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.actions button:hover {
+  background-color: #e69500;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.actions button i {
+  font-size: 0.9em;
+}
 
     .pending {
       color: orange;
@@ -177,6 +401,521 @@
       color: red;
       font-weight: 600;
     }
+
+    .leave-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.leave-status.pending {
+  background-color: #FFA500;
+  color: #000;
+}
+
+.leave-status.approved {
+  background-color: #28a745;
+  color: white;
+}
+
+.leave-status.rejected {
+  background-color: #dc3545;
+  color: white;
+}
+
+
+    .clearance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.clearance-table th {
+  background-color: #000;
+  color: #FFD700;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.clearance-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.clearance-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.clearance-status.pending {
+  background-color: #FFA500;
+  color: #000;
+}
+
+.clearance-status.completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.clearance-status.rejected {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .summary-cards .card {
+    min-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+  
+  .sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .search-container {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+/* Clearance Table Scrollable Styles */
+.clearance-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.clearance-table thead {
+  display: table;
+  width: calc(100% - 10px);
+  table-layout: fixed;
+}
+
+.clearance-table tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.clearance-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.clearance-table th, 
+.clearance-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.clearance-table th {
+  background-color: #000;
+  color: #FFD700;
+}
+
+.clearance-table td {
+  background-color: #fff;
+  color: #333;
+}
+.clearance-table tbody tr {
+  animation: fadeInRow 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Stagger the row animations */
+.clearance-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.clearance-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.clearance-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.clearance-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.clearance-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+}.manage-btn {
+  background-color: #FFA500;
+  color: #000;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.manage-btn:hover {
+  background-color: #e69500;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.manage-btn i {
+  font-size: 0.9em;
+}
+/* Promotion Table Styles */
+/* Promotion Table Styles */
+.promotion-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.promotion-table th {
+  background-color: #000;
+  color: #FFD700;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.promotion-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.eligibility-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.eligibility-status.eligible {
+  background-color: #28a745;
+  color: white;
+}
+
+.eligibility-status.not-eligible {
+  background-color: #dc3545;
+  color: white;
+}
+
+.eligibility-status.pending {
+  background-color: #FFA500;
+  color: #000;
+}
+
+/* Promotion indicator */
+.promotion-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.promotion-indicator.eligible {
+  background-color: #28a745;
+}
+
+.promotion-indicator.not-eligible {
+  background-color: #dc3545;
+}
+
+.promotion-indicator.pending {
+  background-color: #FFA500;
+}
+
+/* Make promotion table scrollable */
+.promotion-table tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.promotion-table thead {
+  display: table;
+  width: calc(100% - 10px);
+  table-layout: fixed;
+}
+
+.promotion-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.recruitment-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.recruitment-table th {
+  background-color: #000;
+  color: #FFD700;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.recruitment-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.recruitment-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.recruitment-status.in-process {
+  background-color: #FFA500;
+  color: #000;
+}
+
+.recruitment-status.offered {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.recruitment-status.hired {
+  background-color: #28a745;
+  color: white;
+}
+
+.recruitment-status.rejected {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Make recruitment table scrollable */
+.recruitment-table tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.recruitment-table thead {
+  display: table;
+  width: calc(100% - 10px);
+  table-layout: fixed;
+}
+
+.recruitment-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Add row animations for recruitment table */
+.recruitment-table tbody tr {
+  animation: fadeInRow 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Stagger the row animations */
+.recruitment-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.recruitment-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.recruitment-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.recruitment-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.recruitment-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+/* Training Table Styles */
+.training-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.training-table th {
+  background-color: #000;
+  color: #FFD700;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.training-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.training-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 100px;
+  text-align: center;
+}
+
+.training-status.completed {
+  background-color: #28a745;
+  color: white;
+}
+
+.training-status.in-progress {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.training-status.upcoming {
+  background-color: #6c757d;
+  color: white;
+}
+
+.training-status.cancelled {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Make training table scrollable */
+.training-table tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.training-table thead {
+  display: table;
+  width: calc(100% - 10px);
+  table-layout: fixed;
+}
+
+.training-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Add row animations for training table */
+.training-table tbody tr {
+  animation: fadeInRow 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Stagger the row animations */
+.training-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.training-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.training-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.training-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.training-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
+
+
+/* BFP Placement Table Styles */
+.placement-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.placement-table th {
+  background-color: #000;
+  color: #FFD700;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.placement-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+}
+
+.placement-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
+}
+
+.placement-status.eligible {
+  background-color: #28a745;
+  color: white;
+}
+
+.placement-status.not-eligible {
+  background-color: #dc3545;
+  color: white;
+}
+
+.placement-status.pending {
+  background-color: #FFA500;
+  color: #000;
+}
+
+.placement-status.priority {
+  background-color: #6f42c1;
+  color: white;
+}
+
+/* Make placement table scrollable */
+.placement-table tbody {
+  display: block;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.placement-table thead {
+  display: table;
+  width: calc(100% - 10px);
+  table-layout: fixed;
+}
+
+.placement-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Add row animations for placement table */
+.placement-table tbody tr {
+  animation: fadeInRow 0.3s ease forwards;
+  opacity: 0;
+}
+
+/* Stagger the row animations */
+.placement-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+.placement-table tbody tr:nth-child(2) { animation-delay: 0.2s; }
+.placement-table tbody tr:nth-child(3) { animation-delay: 0.3s; }
+.placement-table tbody tr:nth-child(4) { animation-delay: 0.4s; }
+.placement-table tbody tr:nth-child(5) { animation-delay: 0.5s; }
   </style>
 </head>
 <body>
@@ -212,9 +951,13 @@
       </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" style="margin-top: 30px;">
       <div class="table-header">
         <h2>Recent Leave Requests</h2>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search leave requests...">
+          <i class="fas fa-search search-icon"></i>
+        </div>
         <a href="/leaveManagement.html">View All</a>
       </div>
       <table>
@@ -223,6 +966,7 @@
             <th>Employee</th>
             <th>Leave Type</th>
             <th>Dates</th>
+            <th>Reason</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -232,64 +976,416 @@
         </tbody>
       </table>
     </div>
+
+    <div id="reasonModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h3 class="modal-title">Leave Request Details</h3>
+        <div class="modal-body">
+          <p><strong>Employee:</strong> <span id="modalEmployee"></span></p>
+          <p><strong>Leave Type:</strong> <span id="modalLeaveType"></span></p>
+          <p><strong>Dates:</strong> <span id="modalDates"></span></p>
+          <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+          <p><strong>Reason:</strong></p>
+          <div id="modalReason" class="reason-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container" style="margin-top: 30px;">
+      <div class="table-header">
+        <h2>Recent Clearance Requests</h2>
+        <div class="search-container">
+          <input type="text" id="clearanceSearchInput" class="searchInput" placeholder="Search clearance requests...">
+          <i class="fas fa-search search-icon"></i>
+        </div>
+        <a href="/clearanceSystem.html">View All</a>
+      </div>
+      <table class="clearance-table">
+      <thead>
+        <tr>
+          <th>Request Date</th>
+          <th>Employee</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="recentClearancesBody">
+        <!-- JS will populate -->
+      </tbody>
+    </table>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const leaves = JSON.parse(localStorage.getItem('leaveRequests')) || [];
-      const pendingLeaves = leaves.filter(r => r.status === 'Pending').length;
-      document.getElementById('pendingLeaves').textContent = pendingLeaves;
 
-      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
-      const maintenanceCount = inventory.filter(item => item.status === 'Needs Maintenance').length;
-      document.getElementById('maintenanceCount').textContent = maintenanceCount;
+  <div class="table-container" style="margin-top: 30px;">
+    <div class="table-header">
+      <h2>Promotion Eligibility</h2>
+      <div class="search-container">
+        <input type="text" id="promotionSearchInput" class="searchInput" placeholder="Search personnel...">
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <a href="/personnelRegister.html">View All</a>
+    </div>
+    <table class="promotion-table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Current Rank</th>
+          <th>Years in Rank</th>
+          <th>Next Rank</th>
+          <th>Eligibility Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promotionBody">
+        <!-- JS will populate -->
+      </tbody>
+    </table>
+  </div>
 
-      const clearances = JSON.parse(localStorage.getItem('clearanceRequests')) || [];
-      const pendingClearances = clearances.filter(c => c.status === 'Pending').length;
-      document.getElementById('pendingClearances').textContent = pendingClearances;
+    <div class="table-container" style="margin-top: 30px;">
+      <div class="table-header">
+        <h2>Recruitment Pipeline</h2>
+        <div class="search-container">
+          <input type="text" id="recruitmentSearchInput" class="searchInput" placeholder="Search candidates...">
+          <i class="fas fa-search search-icon"></i>
+        </div>
+        <a href="#">View All</a>
+      </div>
+      <table class="recruitment-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Position</th>
+            <th>Application Date</th>
+            <th>Stage</th>
+            <th>Interview Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="recruitmentBody">
+          <!-- Sample data - would be populated by JS in real implementation -->
+          <tr>
+            <td>John Smith</td>
+            <td>Software Engineer</td>
+            <td>2023-10-15</td>
+            <td>Technical Interview</td>
+            <td>2023-11-02</td>
+            <td><span class="recruitment-status in-process">In Process</span></td>
+            <td>
+              <button class="manage-btn" onclick="viewCandidate('1')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Sarah Johnson</td>
+            <td>HR Manager</td>
+            <td>2023-10-18</td>
+            <td>Final Interview</td>
+            <td>2023-11-05</td>
+            <td><span class="recruitment-status offered">Offer Sent</span></td>
+            <td>
+              <button class="manage-btn" onclick="viewCandidate('2')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Michael Brown</td>
+            <td>System Administrator</td>
+            <td>2023-10-20</td>
+            <td>Phone Screening</td>
+            <td>2023-10-28</td>
+            <td><span class="recruitment-status rejected">Rejected</span></td>
+            <td>
+              <button class="manage-btn" onclick="viewCandidate('3')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Emily Davis</td>
+            <td>Marketing Specialist</td>
+            <td>2023-10-22</td>
+            <td>Assessment</td>
+            <td>2023-11-01</td>
+            <td><span class="recruitment-status in-process">In Process</span></td>
+            <td>
+              <button class="manage-btn" onclick="viewCandidate('4')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>David Wilson</td>
+            <td>Data Analyst</td>
+            <td>2023-10-25</td>
+            <td>HR Interview</td>
+            <td>2023-11-03</td>
+            <td><span class="recruitment-status hired">Hired</span></td>
+            <td>
+              <button class="manage-btn" onclick="viewCandidate('5')">
+                <i class="fas fa-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      const tbody = document.getElementById('recentLeavesBody');
-      tbody.innerHTML = '';
-      if (!leaves.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No leave requests found.</td></tr>';
-        return;
-      }
+    <div id="candidateModal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h3 class="modal-title">Candidate Details</h3>
+        <div class="modal-body">
+          <p><strong>Name:</strong> <span id="modalCandidateName"></span></p>
+          <p><strong>Position:</strong> <span id="modalPosition"></span></p>
+          <p><strong>Application Date:</strong> <span id="modalAppDate"></span></p>
+          <p><strong>Current Stage:</strong> <span id="modalStage"></span></p>
+          <p><strong>Next Interview:</strong> <span id="modalInterviewDate"></span></p>
+          <p><strong>Status:</strong> <span id="modalRecruitmentStatus"></span></p>
+          <p><strong>Notes:</strong></p>
+          <div id="modalCandidateNotes" class="reason-text"></div>
+        </div>
+      </div>
+    </div>
+  
+<!-- Add this after the Recruitment Pipeline table -->
+<div class="table-container" style="margin-top: 30px;">
+  <div class="table-header">
+    <h2>Training Records</h2>
+    <div class="search-container">
+      <input type="text" id="trainingSearchInput" class="searchInput" placeholder="Search training records...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+    <a href="#">View All</a>
+  </div>
+  <table class="training-table">
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>Rank</th>
+        <th>KME</th>
+        <th>Date of Training</th>
+        <th>Hours</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="trainingBody">
+      <!-- Sample data - would be populated by JS in real implementation -->
+      <tr>
+        <td>John Smith</td>
+        <td>Firefighter</td>
+        <td>Fire truck keys</td>
+        <td>2023-09-15 to 2023-09-20</td>
+        <td>40</td>
+        <td><span class="training-status completed">Completed</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewTraining('1')">
+            <i class="fas fa-file-alt"></i> Details
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>Sarah Johnson</td>
+        <td>Chief</td>
+        <td>Station access</td>
+        <td>2023-10-05 to 2023-10-10</td>
+        <td>30</td>
+        <td><span class="training-status completed">Completed</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewTraining('2')">
+            <i class="fas fa-file-alt"></i> Details
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>Michael Brown</td>
+        <td>Lieutenant</td>
+        <td>Tactical Operations</td>
+        <td>2023-11-01 to 2023-11-15</td>
+        <td>80</td>
+        <td><span class="training-status in-progress">In Progress</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewTraining('3')">
+            <i class="fas fa-file-alt"></i> Details
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>Emily Davis</td>
+        <td>Sergeant</td>
+        <td>Weapons Certification</td>
+        <td>2023-08-10 to 2023-08-12</td>
+        <td>20</td>
+        <td><span class="training-status completed">Completed</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewTraining('4')">
+            <i class="fas fa-file-alt"></i> Details
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>David Wilson</td>
+        <td>Firefighter</td>
+        <td>Executive Leadership</td>
+        <td>2023-12-01 to 2023-12-10</td>
+        <td>60</td>
+        <td><span class="training-status upcoming">Upcoming</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewTraining('5')">
+            <i class="fas fa-file-alt"></i> Details
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-      leaves
-        .sort((a, b) => new Date(b.dateOfFiling) - new Date(a.dateOfFiling))
-        .slice(0, 5)
-        .forEach(r => {
-          const sd = new Date(r.startDate), ed = new Date(r.endDate);
-          const opts = { month: 'long', day: 'numeric', year: 'numeric' };
-          const startStr = sd.toLocaleDateString('en-US', opts);
-          const endStr = ed.toLocaleDateString('en-US', opts);
-          const dates = (r.startDate === r.endDate) ? startStr : `${startStr}–${endStr}`;
-          const cls = r.status.toLowerCase();
+<!-- Add this new modal for training details -->
+<div id="trainingModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h3 class="modal-title">Training Details</h3>
+    <div class="modal-body">
+      <p><strong>Employee:</strong> <span id="modalTrainingEmployee"></span></p>
+      <p><strong>Rank:</strong> <span id="modalTrainingRank"></span></p>
+      <p><strong>KME:</strong> <span id="modalTrainingKME"></span></p>
+      <p><strong>Training Dates:</strong> <span id="modalTrainingDates"></span></p>
+      <p><strong>Total Hours:</strong> <span id="modalTrainingHours"></span></p>
+      <p><strong>Status:</strong> <span id="modalTrainingStatus"></span></p>
+      <p><strong>Location:</strong> <span id="modalTrainingLocation"></span></p>
+      <p><strong>Instructor:</strong> <span id="modalTrainingInstructor"></span></p>
+      <p><strong>Notes:</strong></p>
+      <div id="modalTrainingNotes" class="reason-text"></div>
+    </div>
+  </div>
+</div>
 
-          let actionBtn;
-          if (r.status === 'Pending') {
-            actionBtn = `<button onclick="location.href='/leaveManagement.html'">Manage</button>`;
-          } else {
-            actionBtn = `<button onclick="alert(
-              'Employee: ${r.employeeName}\\n' +
-              'Type: ${r.leaveType}\\n' +
-              'Dates: ${dates}\\n' +
-              'Status: ${r.status}'
-            )">View</button>`;
-          }
 
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${r.employeeName}</td>
-            <td>${r.leaveType}</td>
-            <td>${dates}</td>
-            <td class="${cls}">${r.status}</td>
-            <td class="actions">${actionBtn}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-    });
-  </script>
+<!-- Add this after the Training Records table -->
+<div class="table-container" style="margin-top: 30px;">
+  <div class="table-header">
+    <h2>BFP Placement Records</h2>
+    <div class="search-container">
+      <input type="text" id="placementSearchInput" class="searchInput" placeholder="Search placement records...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
+    <a href="#">View All</a>
+  </div>
+  <table class="placement-table">
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>Rank</th>
+        <th>Current Designation</th>
+        <th>Station/Unit</th>
+        <th>Years in Designation</th>
+        <th>Last Promotion Date</th>
+        <th>Eligibility Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="placementBody">
+      <!-- Sample BFP data -->
+      <tr>
+        <td>SFO1 Juan Dela Cruz</td>
+        <td>Senior Fire Officer 1</td>
+        <td>Fire Truck Commander</td>
+        <td>Central Fire Station</td>
+        <td>2.5</td>
+        <td>2021-05-15</td>
+        <td><span class="placement-status eligible">Eligible</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewPlacement('1')">
+            <i class="fas fa-user-edit"></i> Manage
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>FO3 Maria Santos</td>
+        <td>Fire Officer 3</td>
+        <td>Rescue Team Leader</td>
+        <td>Quezon City Fire Station</td>
+        <td>1.2</td>
+        <td>2022-08-20</td>
+        <td><span class="placement-status not-eligible">Not Eligible</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewPlacement('2')">
+            <i class="fas fa-user-edit"></i> Manage
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>FO2 Carlos Reyes</td>
+        <td>Fire Officer 2</td>
+        <td>Fire Safety Inspector</td>
+        <td>Manila Fire District</td>
+        <td>3.8</td>
+        <td>2019-11-10</td>
+        <td><span class="placement-status eligible">Eligible</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewPlacement('3')">
+            <i class="fas fa-user-edit"></i> Manage
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>FO1 Andrea Torres</td>
+        <td>Fire Officer 1</td>
+        <td>Firefighter</td>
+        <td>Pasig Fire Station</td>
+        <td>0.8</td>
+        <td>2023-01-05</td>
+        <td><span class="placement-status pending">Pending Review</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewPlacement('4')">
+            <i class="fas fa-user-edit"></i> Manage
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>SFO2 Ricardo Lim</td>
+        <td>Senior Fire Officer 2</td>
+        <td>Deputy Station Commander</td>
+        <td>Makati Fire Station</td>
+        <td>4.2</td>
+        <td>2019-03-18</td>
+        <td><span class="placement-status priority">Priority Promotion</span></td>
+        <td>
+          <button class="manage-btn" onclick="viewPlacement('5')">
+            <i class="fas fa-user-edit"></i> Manage
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
+<!-- Add this new modal for placement details -->
+<div id="placementModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h3 class="modal-title">BFP Placement Details</h3>
+    <div class="modal-body">
+      <p><strong>Employee:</strong> <span id="modalPlacementEmployee"></span></p>
+      <p><strong>Rank:</strong> <span id="modalPlacementRank"></span></p>
+      <p><strong>Designation:</strong> <span id="modalPlacementDesignation"></span></p>
+      <p><strong>Station/Unit:</strong> <span id="modalPlacementStation"></span></p>
+      <p><strong>Years in Designation:</strong> <span id="modalPlacementYears"></span></p>
+      <p><strong>Last Promotion Date:</strong> <span id="modalPlacementPromoDate"></span></p>
+      <p><strong>Eligibility Status:</strong> <span id="modalPlacementStatus"></span></p>
+      <p><strong>Performance Rating:</strong> <span id="modalPlacementRating"></span></p>
+      <p><strong>Recommended Next Position:</strong> <span id="modalPlacementNextPosition"></span></p>
+      <p><strong>Notes:</strong></p>
+      <div id="modalPlacementNotes" class="reason-text"></div>
+    </div>
+  </div>
+</div>
+<script src="admin.js"></script>
 </body>
 </html>
